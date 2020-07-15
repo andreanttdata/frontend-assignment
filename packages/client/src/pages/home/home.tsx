@@ -1,22 +1,37 @@
+// @ts-nocheck
+
 import React, { FC } from 'react';
+import { map, pathOr } from 'ramda';
+import { useQuery } from '@apollo/react-hooks';
+import { GET_POKEMON } from './query';
+import { Table } from './components/Table';
 
-import { Blurb, EditLine } from './home-styles';
-import { Cra, Apollo, Graphql } from '../../assets';
-import { ImgContainer } from '../../containers';
+interface Pokemon {
+	id: string;
+	name: string;
+	types: string[];
+	classification: string;
+}
 
-const Home: FC = () => (
-	<>
-		<ImgContainer imgs={[Cra, Apollo, Graphql]} />
-		<h1>cra-template-typescript-apollo</h1>
-		<Blurb>
-			Hello, thanks for checking out this template. This template extends the
-			base TypeScript CRA Template, and includes an apollo connection,
-			styled-components, and an "ideal" folder structure.
-		</Blurb>
-		<EditLine>
-			Edit <span>src/pages/home/home.tsx</span> to view changes
-		</EditLine>
-	</>
-);
+interface PokemonNode {
+	node: Pokemon;
+}
 
+const Home: FC = () => {
+	const { loading, error, data } = useQuery(GET_POKEMON);
+
+	const results: object[] = pathOr([], ['pokemons', 'edges'], data);
+	const pokemons: Pokemon[] = map(
+		(pokemon: PokemonNode) => pokemon?.node,
+		results
+	);
+
+	return (
+		<>
+			{loading && <div>Loading...</div>}
+			{error && <div>{`Error! ${error.message}`}</div>}
+			{!loading && !error && <Table data={pokemons} />}
+		</>
+	);
+};
 export default Home;

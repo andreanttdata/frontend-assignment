@@ -4,12 +4,13 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { ApolloProvider } from '@apollo/react-hooks';
 import ApolloClient from 'apollo-boost';
 import * as serviceWorker from './serviceWorker';
+import './app.css';
 
 import { Home, About, Scripts } from './pages';
 import { Layout } from './containers';
 
 const client = new ApolloClient({
-	uri: '', // http://localhost:your-gql-server
+	uri: 'http://localhost:4000/',
 });
 
 export const App: FC = () => (
