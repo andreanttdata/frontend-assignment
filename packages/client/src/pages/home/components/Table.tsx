@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import React from 'react';
+import { map, uniq, unnest, pipe, includes } from 'ramda';
 import { Table as AntdTable, Input, Button, Space, Tag } from 'antd';
 import Highlighter from 'react-highlight-words';
 import { SearchOutlined } from '@ant-design/icons';
@@ -9,8 +10,10 @@ export class Table extends React.Component {
 	state = {
 		searchText: '',
 		searchedColumn: '',
+		filteredInfo: null,
 	};
 
+	// Search
 	getColumnSearchProps = (dataIndex) => ({
 		filterDropdown: ({
 			setSelectedKeys,
@@ -94,8 +97,22 @@ export class Table extends React.Component {
 		this.setState({ searchText: '' });
 	};
 
+	// Filters
+	handleFiltersChange = (pagination, filters) => {
+		this.setState({
+			filteredInfo: filters,
+		});
+	};
+
 	render() {
 		const { data } = this.props;
+		const { filteredInfo = {} } = this.state;
+
+		const selectType = (pokemons) => map((pokemon) => pokemon.types, pokemons);
+		const getTypesList = pipe(selectType, unnest, uniq);
+		const pokemonTypes = getTypesList(data);
+		const filters = map((type) => ({ text: type, value: type }), pokemonTypes);
+
 		const columns = [
 			{
 				title: 'Name',
@@ -107,6 +124,10 @@ export class Table extends React.Component {
 				title: 'Types',
 				dataIndex: 'types',
 				key: 'types',
+				filters,
+				filteredValue: filteredInfo?.types,
+				onFilter: (value, record) => includes(value, record?.types),
+				ellipsis: true,
 				render: (tags) => (
 					<>
 						{tags.map((tag) => (
@@ -128,6 +149,7 @@ export class Table extends React.Component {
 			<AntdTable
 				columns={columns}
 				dataSource={data}
+				onChange={this.handleFiltersChange}
 				tableLayout="fixed"
 				bordered
 			/>
