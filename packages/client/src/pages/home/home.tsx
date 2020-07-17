@@ -30,7 +30,7 @@ const Home: FC = () => {
 		<>
 			{loading && <div>Loading...</div>}
 			{error && <div>{`Error! ${error.message}`}</div>}
-			{!loading && !error && <Table data={pokemons} />}
+			{!loading && !error && <Table initialData={pokemons} />}
 		</>
 	);
 };

@@ -1,8 +1,8 @@
 // @ts-nocheck
 
 import React from 'react';
-import { map, uniq, unnest, pipe, includes } from 'ramda';
-import { Table as AntdTable, Input, Button, Space, Tag } from 'antd';
+import { map, filter, uniq, unnest, pipe, includes } from 'ramda';
+import { Table as AntdTable, Input, Button, Tag } from 'antd';
 import Highlighter from 'react-highlight-words';
 import { SearchOutlined } from '@ant-design/icons';
 
@@ -11,6 +11,7 @@ export class Table extends React.Component {
 		searchText: '',
 		searchedColumn: '',
 		filteredInfo: null,
+		data: this.props.initialData,
 	};
 
 	// Search
@@ -27,33 +28,25 @@ export class Table extends React.Component {
 						this.searchInput = node;
 					}}
 					placeholder={`Search ${dataIndex}`}
-					value={selectedKeys[0]}
-					onChange={(e) =>
-						setSelectedKeys(e.target.value ? [e.target.value] : [])
-					}
+					value={selectedKeys}
+					onChange={(e) => {
+						const pressedKeys = e.target.value;
+						setSelectedKeys(pressedKeys ? [pressedKeys] : []);
+						this.handleSearch(pressedKeys, confirm, dataIndex);
+					}}
 					onPressEnter={() =>
 						this.handleSearch(selectedKeys, confirm, dataIndex)
 					}
-					style={{ width: 188, marginBottom: 8, display: 'block' }}
+					style={{ maxWidth: 188, marginBottom: 8, display: 'block' }}
 				/>
-				<Space>
-					<Button
-						type="primary"
-						onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
-						icon={<SearchOutlined />}
-						size="small"
-						style={{ width: 90 }}
-					>
-						Search
-					</Button>
-					<Button
-						onClick={() => this.handleReset(clearFilters)}
-						size="small"
-						style={{ width: 90 }}
-					>
-						Reset
-					</Button>
-				</Space>
+				<Button
+					type="primary"
+					onClick={() => this.handleReset(clearFilters)}
+					size="small"
+					style={{ width: '100%' }}
+				>
+					Reset
+				</Button>
 			</div>
 		),
 		filterIcon: (filtered) => (
@@ -85,16 +78,26 @@ export class Table extends React.Component {
 	});
 
 	handleSearch = (selectedKeys, confirm, dataIndex) => {
-		confirm();
-		this.setState({
-			searchText: selectedKeys[0],
-			searchedColumn: dataIndex,
+		this.setState((prevState, props) => {
+			return {
+				data: filter((pokemon) => {
+					return includes(
+						selectedKeys.toLowerCase(),
+						pokemon.name.toLowerCase()
+					);
+				}, props.initialData),
+				searchText: selectedKeys,
+				searchedColumn: dataIndex,
+			};
 		});
 	};
 
 	handleReset = (clearFilters) => {
 		clearFilters();
-		this.setState({ searchText: '' });
+		this.setState((prevState, props) => ({
+			data: props.initialData,
+			searchText: '',
+		}));
 	};
 
 	// Filters
@@ -105,8 +108,7 @@ export class Table extends React.Component {
 	};
 
 	render() {
-		const { data } = this.props;
-		const { filteredInfo = {} } = this.state;
+		const { data, filteredInfo = {} } = this.state;
 
 		const selectType = (pokemons) => map((pokemon) => pokemon.types, pokemons);
 		const getTypesList = pipe(selectType, unnest, uniq);
