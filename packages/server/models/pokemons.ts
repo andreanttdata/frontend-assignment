@@ -28,6 +28,13 @@ export function query(args: {
       ? identity
       : A.filter((p) => p.name.toLowerCase().includes(q.toLowerCase()));
 
+  const sliceClassification = (pokemons: Pokemon[]) => {
+    return pokemons.map((pokemon) => {
+      pokemon.classification = pokemon.classification.replace(" Pokémon", "");
+      return pokemon;
+    });
+  };
+
   const sliceByAfter: (as: Pokemon[]) => Pokemon[] =
     // filter only if q is defined
     after === undefined
@@ -47,6 +54,7 @@ export function query(args: {
     data,
     filterByQ,
     sliceByAfter,
+    sliceClassification,
     // slicing limit + 1 because the `toConnection` function should known the connection size to determine if there are more results
     slice(0, limit + 1)
   );
