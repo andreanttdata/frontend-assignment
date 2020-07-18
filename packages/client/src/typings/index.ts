@@ -1,6 +1,6 @@
-// Global types (types not confined to one component) go here
-
-export type MyType = {
-	// first: string;
-	// second: number;
-};
+export interface Pokemon {
+	id: string;
+	name: string;
+	types: string[];
+	classification: string;
+}

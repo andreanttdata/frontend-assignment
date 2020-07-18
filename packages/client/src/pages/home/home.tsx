@@ -1,17 +1,9 @@
-// @ts-nocheck
-
 import React, { FC } from 'react';
 import { map, pathOr } from 'ramda';
 import { useQuery } from '@apollo/react-hooks';
 import { GET_POKEMON } from './query';
 import { Table } from './components/Table';
-
-interface Pokemon {
-	id: string;
-	name: string;
-	types: string[];
-	classification: string;
-}
+import { Pokemon } from '../../typings/index';
 
 interface PokemonNode {
 	node: Pokemon;

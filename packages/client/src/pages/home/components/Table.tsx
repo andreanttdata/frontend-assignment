@@ -5,8 +5,20 @@ import { map, filter, uniq, unnest, pipe, includes } from 'ramda';
 import { Table as AntdTable, Input, Button, Tag } from 'antd';
 import Highlighter from 'react-highlight-words';
 import { SearchOutlined } from '@ant-design/icons';
+import { Pokemon } from '../../../typings/index';
 
-export class Table extends React.Component {
+interface TableState {
+	searchText: string;
+	searchedColumn: string;
+	filteredInfo: object;
+	data: object;
+}
+
+interface TableProps {
+	initialData: Pokemon[];
+}
+
+export class Table extends React.Component<TableProps, TableState> {
 	state = {
 		searchText: '',
 		searchedColumn: '',
