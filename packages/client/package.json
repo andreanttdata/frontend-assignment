@@ -57,6 +57,9 @@
 		]
 	},
 	"devDependencies": {
-		"@graphql-codegen/cli": "^1.17.0"
+		"@graphql-codegen/cli": "^1.17.0",
+		"@testing-library/cypress": "^6.0.0",
+		"cypress": "^4.10.0",
+		"eslint-plugin-cypress": "^2.11.1"
 	}
 }

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { map, filter, uniq, unnest, pipe, includes } from 'ramda';
-import { Table as AntdTable, Input, Button, Tag } from 'antd';
+import { Table as AntdTable, Input, Button, Tag, message } from 'antd';
 import Highlighter from 'react-highlight-words';
 import { SearchOutlined } from '@ant-design/icons';
 import { Pokemon } from '../../../typings/index';
@@ -44,6 +44,7 @@ export class Table extends React.Component<TableProps, TableState> {
 	componentDidUpdate(prevProps, prevState) {
 		if (prevProps.initialData !== this.props.initialData) {
 			this.updateTableData(this.props.initialData);
+			message.success('More pokemons added!');
 		}
 	}
 
@@ -187,6 +188,7 @@ export class Table extends React.Component<TableProps, TableState> {
 				onChange={this.handleFiltersChange}
 				tableLayout="fixed"
 				bordered
+				data-testid="table"
 			/>
 		);
 	}
