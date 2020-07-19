@@ -1,8 +1,8 @@
 import { gql } from 'apollo-boost';
 
 export const GET_POKEMON = gql`
-	query {
-		pokemons {
+	query($after: ID!) {
+		pokemons(after: $after) {
 			edges {
 				node {
 					id
@@ -10,6 +10,11 @@ export const GET_POKEMON = gql`
 					types
 					classification
 				}
+				cursor
+			}
+			pageInfo {
+				endCursor
+				hasNextPage
 			}
 		}
 	}
