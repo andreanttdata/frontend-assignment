@@ -19,12 +19,33 @@ interface TableProps {
 }
 
 export class Table extends React.Component<TableProps, TableState> {
-	state = {
-		searchText: '',
-		searchedColumn: '',
-		filteredInfo: null,
-		data: this.props.initialData,
+	constructor(props) {
+		super(props);
+		this.state = {
+			searchText: '',
+			searchedColumn: '',
+			filteredInfo: null,
+			data: [],
+		};
+	}
+
+	updateTableData = (freshTableData) => {
+		this.setState({
+			data: freshTableData,
+		});
 	};
+
+	componentDidMount() {
+		this.setState({
+			data: this.props.initialData,
+		});
+	}
+
+	componentDidUpdate(prevProps, prevState) {
+		if (prevProps.initialData !== this.props.initialData) {
+			this.updateTableData(this.props.initialData);
+		}
+	}
 
 	// Search
 	getColumnSearchProps = (dataIndex) => ({
