@@ -1,25 +1,24 @@
-// ***********************************************
-// This example commands.js shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add("login", (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add("drag", { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add("dismiss", { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+import { capitalize } from '../../src/utils/capitalize';
+
+Cypress.Commands.add('selectSomeFilters', () => {
+	cy.findByRole('button', { name: 'filter' }).click();
+	cy.get('[type="checkbox"]').eq(0).check().should('be.checked');
+	cy.get('[type="checkbox"]').eq(1).check().should('be.checked');
+	cy.findByRole('button', { name: /ok/i }).click();
+	cy.get('.ant-table-row').each(($tr) => {
+		cy.get($tr)
+			.children()
+			.eq(1)
+			.contains(/grass|poison/i)
+			.should('exist');
+	});
+	// after this set of instructions we need to get back to the main context
+	cy.get('main');
+});
+
+Cypress.Commands.add('searchPokemonByName', (pokemon) => {
+	cy.findByRole('button', { name: 'search' }).click();
+	cy.findByPlaceholderText('Search name')
+		.type(pokemon)
+		.then(() => capitalize(pokemon));
+});

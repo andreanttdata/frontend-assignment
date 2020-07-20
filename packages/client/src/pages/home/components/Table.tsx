@@ -188,7 +188,6 @@ export class Table extends React.Component<TableProps, TableState> {
 				onChange={this.handleFiltersChange}
 				tableLayout="fixed"
 				bordered
-				data-testid="table"
 			/>
 		);
 	}

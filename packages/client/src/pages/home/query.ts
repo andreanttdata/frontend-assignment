@@ -10,7 +10,6 @@ export const GET_POKEMON = gql`
 					types
 					classification
 				}
-				cursor
 			}
 			pageInfo {
 				endCursor
