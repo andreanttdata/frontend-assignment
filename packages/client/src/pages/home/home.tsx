@@ -13,7 +13,7 @@ interface PokemonNode {
 	node: Pokemon;
 }
 
-const Home: FC = () => {
+export const Home: FC = () => {
 	const { loading, error, data, fetchMore } = useQuery(GET_POKEMON);
 	const [height, width] = useWindowSize();
 
@@ -62,4 +62,3 @@ const Home: FC = () => {
 		</Space>
 	);
 };
-export default Home;

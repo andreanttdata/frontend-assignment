@@ -35,9 +35,6 @@
 		"build": "react-scripts build",
 		"test": "react-scripts test",
 		"eject": "react-scripts eject",
-		"lint": "prettier --write \"**/**/*.{ts,tsx,json}\"",
-		"generate": "scripts/component-gen.sh",
-		"destroy": "scripts/wrath-of-god.sh",
 		"cypress:open": "yarn cypress open",
 		"cypress:run": "yarn cypress run"
 	},

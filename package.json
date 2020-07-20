@@ -14,8 +14,7 @@
     "start:client": "yarn workspace @frontend-assignment/client start",
     "start:server": "yarn workspace @frontend-assignment/server start",
     "cy:o": "yarn workspace @frontend-assignment/client cypress:open",
-    "cy:start": "yarn workspace @frontend-assignment/client cypress:run",
-    "gen": "yarn workspace @frontend-assignment/client generate"
+    "cy:start": "yarn workspace @frontend-assignment/client cypress:run"
   },
   "workspaces": [
     "packages/*"
