@@ -7,6 +7,7 @@ import { useQuery } from '@apollo/react-hooks';
 import { GET_POKEMON } from './query';
 import { Table } from './components/Table';
 import { Pokemon } from '../../typings/index';
+import { useWindowSize } from '../../utils/useWindowSize';
 
 interface PokemonNode {
 	node: Pokemon;
@@ -14,10 +15,12 @@ interface PokemonNode {
 
 const Home: FC = () => {
 	const { loading, error, data, fetchMore } = useQuery(GET_POKEMON);
+	const [height, width] = useWindowSize();
 
 	if (loading) return 'Loading...';
 	if (error) return `Error! ${error.message}`;
 
+	const isMobile = width <= 375;
 	const { hasNextPage }: { hasNextPage: boolean } = data.pokemons.pageInfo;
 	const results: object[] = pathOr([], ['pokemons', 'edges'], data);
 	const pokemons: Pokemon[] = map(
@@ -55,7 +58,7 @@ const Home: FC = () => {
 			>
 				Load More
 			</Button>
-			<Table initialData={pokemons} />
+			<Table initialData={pokemons} isMobile={isMobile} />
 		</Space>
 	);
 };

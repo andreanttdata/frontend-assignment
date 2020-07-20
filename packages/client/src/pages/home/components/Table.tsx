@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { map, filter, uniq, unnest, pipe, includes } from 'ramda';
-import { Table as AntdTable, Input, Button, Tag, message } from 'antd';
+import { Table as AntdTable, Input, Button, Tag, message, Space } from 'antd';
 import Highlighter from 'react-highlight-words';
 import { SearchOutlined } from '@ant-design/icons';
 import { Pokemon } from '../../../typings/index';
@@ -143,6 +143,7 @@ export class Table extends React.Component<TableProps, TableState> {
 
 	render() {
 		const { data, filteredInfo = {} } = this.state;
+		const { isMobile } = this.props;
 
 		const selectType = (pokemons) => map((pokemon) => pokemon.types, pokemons);
 		const getTypesList = pipe(selectType, unnest, uniq);
@@ -163,15 +164,15 @@ export class Table extends React.Component<TableProps, TableState> {
 				filters,
 				filteredValue: filteredInfo?.types,
 				onFilter: (value, record) => includes(value, record?.types),
-				ellipsis: true,
+				ellipsis: false,
 				render: (tags) => (
-					<>
+					<Space direction={isMobile ? 'vertical' : 'horizontal'}>
 						{tags.map((tag) => (
 							<Tag color="blue" key={tag}>
 								{tag}
 							</Tag>
 						))}
-					</>
+					</Space>
 				),
 			},
 			{
