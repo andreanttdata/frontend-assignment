@@ -1,8 +1,8 @@
 export const getDeviceType = (width) => {
 	switch (true) {
-		case width <= 375:
+		case width < 768:
 			return { isMobile: true, isTablet: false, isDesktop: false };
-		case width <= 768:
+		case width < 992:
 			return { isMobile: false, isTablet: true, isDesktop: false };
 
 		default:

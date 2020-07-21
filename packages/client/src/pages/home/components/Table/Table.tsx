@@ -159,9 +159,9 @@ export class Table extends React.Component<TableProps, TableState> {
 
 	render() {
 		const { data, filteredInfo = {} } = this.state;
-		const { viewportWidth, loading } = this.props;
+		const { viewportWidth, viewportHeight, loading } = this.props;
 
-		const { isDesktop } = getDeviceType(viewportWidth);
+		const { isMobile } = getDeviceType(viewportWidth);
 		const selectType = (pokemons) => map((pokemon) => pokemon.types, pokemons);
 		const getTypesList = pipe(selectType, unnest, uniq);
 		const pokemonTypes = getTypesList(data);
@@ -182,7 +182,7 @@ export class Table extends React.Component<TableProps, TableState> {
 				filteredValue: filteredInfo?.types,
 				onFilter: (value, record) => includes(value, record?.types),
 				ellipsis: false,
-				render: (tags) => <TagsList tags={tags} isDesktop={isDesktop} />,
+				render: (tags) => <TagsList tags={tags} isMobile={isMobile} />,
 			},
 			{
 				title: 'Classification',
@@ -198,7 +198,7 @@ export class Table extends React.Component<TableProps, TableState> {
 				onChange={this.handleFiltersChange}
 				loading={loading}
 				rowKey="id"
-				scroll={{ y: isDesktop ? 800 : 500 }}
+				scroll={{ y: viewportHeight - 150 }}
 				tableLayout="fixed"
 				bordered
 			/>

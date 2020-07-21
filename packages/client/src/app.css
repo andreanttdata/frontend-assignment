@@ -1,1 +1,8 @@
 @import '~antd/dist/antd.css';
+
+/* overriding antd classes */
+@media only screen and (max-width: 768px) {
+	.ant-btn.ant-btn-loading {
+		position: fixed;
+	}
+}

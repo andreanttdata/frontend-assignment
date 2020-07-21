@@ -29,7 +29,7 @@ export const Home: FC = () => {
 	if (isLoadingAtStart) return <Loader />;
 	if (error) return <div>Error! {error.message}</div>;
 
-	const { isDesktop } = getDeviceType(width);
+	const { isMobile } = getDeviceType(width);
 	const { hasNextPage }: { hasNextPage: boolean } = data.pokemons.pageInfo;
 	const results: object[] = pathOr([], ['pokemons', 'edges'], data);
 	const pokemons: Pokemon[] = map(
@@ -43,8 +43,8 @@ export const Home: FC = () => {
 				type="primary"
 				disabled={!hasNextPage}
 				loading={isFetchingMore}
-				block={!isDesktop}
-				size={!isDesktop ? 'large' : 'middle'}
+				block={isMobile}
+				size={isMobile ? 'large' : 'middle'}
 				onClick={() => {
 					fetchMorePokemons(data, fetchMore);
 				}}
