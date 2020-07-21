@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { FC } from 'react';
 import { map, pathOr } from 'ramda';
 import { Button, Space } from 'antd';
@@ -8,17 +6,26 @@ import { GET_POKEMON } from './query';
 import { Table } from './components/Table';
 import { Pokemon } from '../../typings/index';
 import { useWindowSize } from '../../utils/useWindowSize';
+import { fetchMorePokemons } from './utils/fetchMorePokemons';
+import { Loader } from '../../components/Loader';
 
 interface PokemonNode {
 	node: Pokemon;
 }
 
 export const Home: FC = () => {
-	const { loading, error, data, fetchMore } = useQuery(GET_POKEMON);
+	const { loading, error, data, fetchMore, networkStatus } = useQuery(
+		GET_POKEMON,
+		{
+			notifyOnNetworkStatusChange: true,
+		}
+	);
 	const [height, width] = useWindowSize();
+	const isLoadingAtStart = loading && networkStatus === 1;
+	const isFetchingMore = loading && networkStatus === 3;
 
-	if (loading) return 'Loading...';
-	if (error) return `Error! ${error.message}`;
+	if (isLoadingAtStart) return <Loader />;
+	if (error) return <div>Error! {error.message}</div>;
 
 	const { hasNextPage }: { hasNextPage: boolean } = data.pokemons.pageInfo;
 	const results: object[] = pathOr([], ['pokemons', 'edges'], data);
@@ -32,32 +39,18 @@ export const Home: FC = () => {
 			<Button
 				type="primary"
 				disabled={!hasNextPage}
-				onClick={() =>
-					fetchMore({
-						variables: {
-							after: data.pokemons.pageInfo.endCursor,
-						},
-						updateQuery: (prev, { fetchMoreResult, queryVariables }) => {
-							if (!fetchMoreResult) return prev;
-							return {
-								pokemons: {
-									edges: [
-										...prev.pokemons.edges,
-										...fetchMoreResult.pokemons.edges,
-									],
-									pageInfo: {
-										...fetchMoreResult.pokemons.pageInfo,
-									},
-									__typename: 'PokemonsConnection',
-								},
-							};
-						},
-					})
-				}
+				loading={isFetchingMore}
+				onClick={() => {
+					fetchMorePokemons(data, fetchMore);
+				}}
 			>
 				Load More
 			</Button>
-			<Table initialData={pokemons} width={width} />
+			<Table
+				initialData={pokemons}
+				viewportWidth={width}
+				viewportHeight={height}
+			/>
 		</Space>
 	);
 };

@@ -17,6 +17,8 @@ interface TableState {
 
 interface TableProps {
 	initialData: Pokemon[];
+	viewportWidth: number;
+	viewportHeight: number;
 }
 
 export class Table extends React.Component<TableProps, TableState> {
@@ -46,7 +48,10 @@ export class Table extends React.Component<TableProps, TableState> {
 		const nextProps = this.props;
 
 		if (prevProps.initialData !== nextProps.initialData) {
-			if (prevProps.width !== nextProps.width) {
+			if (
+				prevProps.viewportWidth !== nextProps.viewportWidth ||
+				prevProps.viewportHeight !== nextProps.viewportHeight
+			) {
 				return null;
 			}
 			this.updateTableData(nextProps.initialData);
