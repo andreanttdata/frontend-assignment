@@ -20,7 +20,6 @@ export const Home: FC = () => {
 	if (loading) return 'Loading...';
 	if (error) return `Error! ${error.message}`;
 
-	const isMobile = width <= 375;
 	const { hasNextPage }: { hasNextPage: boolean } = data.pokemons.pageInfo;
 	const results: object[] = pathOr([], ['pokemons', 'edges'], data);
 	const pokemons: Pokemon[] = map(
@@ -58,7 +57,7 @@ export const Home: FC = () => {
 			>
 				Load More
 			</Button>
-			<Table initialData={pokemons} isMobile={isMobile} />
+			<Table initialData={pokemons} width={width} />
 		</Space>
 	);
 };

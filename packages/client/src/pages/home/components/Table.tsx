@@ -6,6 +6,7 @@ import { Table as AntdTable, Input, Button, Tag, message, Space } from 'antd';
 import Highlighter from 'react-highlight-words';
 import { SearchOutlined } from '@ant-design/icons';
 import { Pokemon } from '../../../typings/index';
+import { getDeviceType } from '../../../utils/getDeviceType';
 
 interface TableState {
 	searchText: string;
@@ -42,8 +43,13 @@ export class Table extends React.Component<TableProps, TableState> {
 	}
 
 	componentDidUpdate(prevProps, prevState) {
-		if (prevProps.initialData !== this.props.initialData) {
-			this.updateTableData(this.props.initialData);
+		const nextProps = this.props;
+
+		if (prevProps.initialData !== nextProps.initialData) {
+			if (prevProps.width !== nextProps.width) {
+				return null;
+			}
+			this.updateTableData(nextProps.initialData);
 			message.success('More pokemons added!');
 		}
 	}
@@ -143,8 +149,9 @@ export class Table extends React.Component<TableProps, TableState> {
 
 	render() {
 		const { data, filteredInfo = {} } = this.state;
-		const { isMobile } = this.props;
+		const { width } = this.props;
 
+		const { isDesktop } = getDeviceType(width);
 		const selectType = (pokemons) => map((pokemon) => pokemon.types, pokemons);
 		const getTypesList = pipe(selectType, unnest, uniq);
 		const pokemonTypes = getTypesList(data);
@@ -166,7 +173,7 @@ export class Table extends React.Component<TableProps, TableState> {
 				onFilter: (value, record) => includes(value, record?.types),
 				ellipsis: false,
 				render: (tags) => (
-					<Space direction={isMobile ? 'vertical' : 'horizontal'}>
+					<Space direction={isDesktop ? 'horizontal' : 'vertical'}>
 						{tags.map((tag) => (
 							<Tag color="blue" key={tag}>
 								{tag}
