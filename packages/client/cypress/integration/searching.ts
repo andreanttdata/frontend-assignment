@@ -13,15 +13,17 @@ describe('search for a specific pokemon by name', () => {
 		});
 	});
 	it('should narrow the list of pokemons', () => {
-		cy.findAllByRole('row').then(($tr) => {
+		cy.get('.ant-table-row').then(($tr) => {
 			const currentAmountOfRows = $tr.length;
 
 			cy.searchPokemonByName(POKEMON.grass.name).then((name) => {
-				cy.findAllByRole('row')
+				cy.get('.ant-table-row')
 					.its('length')
 					.should('be.lt', currentAmountOfRows);
 				cy.findByRole('button', { name: /reset/i }).click();
-				cy.findAllByRole('row').its('length').should('eq', currentAmountOfRows);
+				cy.get('.ant-table-row')
+					.its('length')
+					.should('eq', currentAmountOfRows);
 			});
 		});
 	});

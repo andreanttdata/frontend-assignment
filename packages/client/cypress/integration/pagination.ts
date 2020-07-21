@@ -28,14 +28,14 @@ describe('after load more button is clicked', () => {
 	});
 
 	it('should show more pagination links', () => {
-		cy.findAllByRole('listitem').then(($listItems) => {
-			const currentAmountOfPaginationLinks = $listItems.length;
+		cy.findAllByRole('listitem').then(($paginationLinks) => {
+			const currentAmountOfPaginationLinks = $paginationLinks.length;
 
 			cy.findByRole('button', { name: /load more/i })
 				.click()
 				.then(() => {
-					cy.findAllByRole('listitem').then(($updatedListItems) => {
-						cy.get($updatedListItems)
+					cy.findAllByRole('listitem').then(($updatedPaginationLinks) => {
+						cy.get($updatedPaginationLinks)
 							.its('length')
 							.should('be.gt', currentAmountOfPaginationLinks);
 					});
