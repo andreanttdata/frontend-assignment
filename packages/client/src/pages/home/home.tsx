@@ -56,6 +56,7 @@ export const Home: FC = () => {
 				viewportWidth={width}
 				viewportHeight={height}
 				networkStatus={networkStatus}
+				loading={isLoadingAtStart || isFetchingMore}
 			/>
 		</>
 	);

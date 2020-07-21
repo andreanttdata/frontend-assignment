@@ -21,6 +21,8 @@ interface TableProps {
 	viewportWidth: number;
 	viewportHeight: number;
 	networkStatus: number;
+	networkStatus: number;
+	loading: boolean;
 }
 
 export class Table extends React.Component<TableProps, TableState> {
@@ -157,7 +159,7 @@ export class Table extends React.Component<TableProps, TableState> {
 
 	render() {
 		const { data, filteredInfo = {} } = this.state;
-		const { viewportWidth } = this.props;
+		const { viewportWidth, loading } = this.props;
 
 		const { isDesktop } = getDeviceType(viewportWidth);
 		const selectType = (pokemons) => map((pokemon) => pokemon.types, pokemons);
@@ -194,6 +196,7 @@ export class Table extends React.Component<TableProps, TableState> {
 				columns={columns}
 				dataSource={data}
 				onChange={this.handleFiltersChange}
+				loading={loading}
 				rowKey="id"
 				scroll={{ y: isDesktop ? 800 : 500 }}
 				tableLayout="fixed"
