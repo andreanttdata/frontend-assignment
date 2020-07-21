@@ -10,7 +10,11 @@ export const App: FC = () => (
 );
 
 const Main = styled.main`
-	margin: 5% auto;
-	padding: 0 5%;
 	max-width: 1200px;
+	padding: 5%;
+
+	@media (max-width: 768px) {
+		padding: 0;
+		margin: 0;
+	}
 `;

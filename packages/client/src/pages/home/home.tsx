@@ -1,13 +1,15 @@
 import React, { FC } from 'react';
 import { map, pathOr } from 'ramda';
-import { Button, Space } from 'antd';
+import { Button } from 'antd';
+import styled from 'styled-components';
 import { useQuery } from '@apollo/react-hooks';
 import { GET_POKEMON } from './query';
-import { Table } from './components/Table';
+import { Table } from './components/Table/Table';
 import { Pokemon } from '../../typings/index';
 import { useWindowSize } from '../../utils/useWindowSize';
 import { fetchMorePokemons } from './utils/fetchMorePokemons';
 import { Loader } from '../../components/Loader';
+import { getDeviceType } from '../../utils/getDeviceType';
 
 interface PokemonNode {
 	node: Pokemon;
@@ -27,6 +29,7 @@ export const Home: FC = () => {
 	if (isLoadingAtStart) return <Loader />;
 	if (error) return <div>Error! {error.message}</div>;
 
+	const { isDesktop } = getDeviceType(width);
 	const { hasNextPage }: { hasNextPage: boolean } = data.pokemons.pageInfo;
 	const results: object[] = pathOr([], ['pokemons', 'edges'], data);
 	const pokemons: Pokemon[] = map(
@@ -35,22 +38,36 @@ export const Home: FC = () => {
 	);
 
 	return (
-		<Space direction="vertical">
-			<Button
+		<>
+			<StyledButton
 				type="primary"
 				disabled={!hasNextPage}
 				loading={isFetchingMore}
+				block={!isDesktop}
+				size={!isDesktop ? 'large' : 'middle'}
 				onClick={() => {
 					fetchMorePokemons(data, fetchMore);
 				}}
 			>
 				Load More
-			</Button>
+			</StyledButton>
 			<Table
 				initialData={pokemons}
 				viewportWidth={width}
 				viewportHeight={height}
+				networkStatus={networkStatus}
 			/>
-		</Space>
+		</>
 	);
 };
+
+const StyledButton = styled(Button)`
+	margin-bottom: 8px;
+
+	@media (max-width: 768px) {
+		position: fixed;
+		bottom: 0;
+		z-index: 1;
+		margin-bottom: 0;
+	}
+`;

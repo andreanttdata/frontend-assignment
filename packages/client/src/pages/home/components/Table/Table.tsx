@@ -2,11 +2,12 @@
 
 import React from 'react';
 import { map, filter, uniq, unnest, pipe, includes } from 'ramda';
-import { Table as AntdTable, Input, Button, Tag, message, Space } from 'antd';
+import { Table as AntdTable, Input, Button, message } from 'antd';
 import Highlighter from 'react-highlight-words';
 import { SearchOutlined } from '@ant-design/icons';
-import { Pokemon } from '../../../typings/index';
-import { getDeviceType } from '../../../utils/getDeviceType';
+import { TagsList } from './components/TagsList';
+import { Pokemon } from '../../../../typings/index';
+import { getDeviceType } from '../../../../utils/getDeviceType';
 
 interface TableState {
 	searchText: string;
@@ -19,6 +20,7 @@ interface TableProps {
 	initialData: Pokemon[];
 	viewportWidth: number;
 	viewportHeight: number;
+	networkStatus: number;
 }
 
 export class Table extends React.Component<TableProps, TableState> {
@@ -50,7 +52,8 @@ export class Table extends React.Component<TableProps, TableState> {
 		if (prevProps.initialData !== nextProps.initialData) {
 			if (
 				prevProps.viewportWidth !== nextProps.viewportWidth ||
-				prevProps.viewportHeight !== nextProps.viewportHeight
+				prevProps.viewportHeight !== nextProps.viewportHeight ||
+				prevProps.networkStatus !== nextProps.networkStatus
 			) {
 				return null;
 			}
@@ -154,9 +157,9 @@ export class Table extends React.Component<TableProps, TableState> {
 
 	render() {
 		const { data, filteredInfo = {} } = this.state;
-		const { width } = this.props;
+		const { viewportWidth } = this.props;
 
-		const { isDesktop } = getDeviceType(width);
+		const { isDesktop } = getDeviceType(viewportWidth);
 		const selectType = (pokemons) => map((pokemon) => pokemon.types, pokemons);
 		const getTypesList = pipe(selectType, unnest, uniq);
 		const pokemonTypes = getTypesList(data);
@@ -177,15 +180,7 @@ export class Table extends React.Component<TableProps, TableState> {
 				filteredValue: filteredInfo?.types,
 				onFilter: (value, record) => includes(value, record?.types),
 				ellipsis: false,
-				render: (tags) => (
-					<Space direction={isDesktop ? 'horizontal' : 'vertical'}>
-						{tags.map((tag) => (
-							<Tag color="blue" key={tag}>
-								{tag}
-							</Tag>
-						))}
-					</Space>
-				),
+				render: (tags) => <TagsList tags={tags} isDesktop={isDesktop} />,
 			},
 			{
 				title: 'Classification',
@@ -199,6 +194,8 @@ export class Table extends React.Component<TableProps, TableState> {
 				columns={columns}
 				dataSource={data}
 				onChange={this.handleFiltersChange}
+				rowKey="id"
+				scroll={{ y: isDesktop ? 800 : 500 }}
 				tableLayout="fixed"
 				bordered
 			/>
