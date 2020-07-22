@@ -1,29 +1,13 @@
 // @ts-nocheck
 
 import React from 'react';
-import { map, filter, uniq, unnest, pipe, includes } from 'ramda';
-import { Table as AntdTable, Input, Button, message } from 'antd';
-import Highlighter from 'react-highlight-words';
+import { map, uniq, unnest, pipe, includes } from 'ramda';
+import { Table as AntdTable, Input, Button, message, Space } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { TagsList } from './components/TagsList';
-import { Pokemon } from '../../../../typings/index';
-import { getDeviceType } from '../../../../utils/getDeviceType';
-
-interface TableState {
-	searchText: string;
-	searchedColumn: string;
-	filteredInfo: object;
-	data: object;
-}
-
-interface TableProps {
-	initialData: Pokemon[];
-	viewportWidth: number;
-	viewportHeight: number;
-	networkStatus: number;
-	networkStatus: number;
-	loading: boolean;
-}
+import { SearchedResultHighlighter } from './components/SearchedResultHighlighter';
+import { getDeviceType, getItemsFilteredByName } from '../../../../utils';
+import { TableProps, TableState } from './types';
 
 export class Table extends React.Component<TableProps, TableState> {
 	constructor(props) {
@@ -65,77 +49,77 @@ export class Table extends React.Component<TableProps, TableState> {
 	}
 
 	// Search
-	getColumnSearchProps = (dataIndex) => ({
-		filterDropdown: ({
-			setSelectedKeys,
-			selectedKeys,
-			confirm,
-			clearFilters,
-		}) => (
-			<div style={{ padding: 8 }}>
-				<Input
-					ref={(node) => {
-						this.searchInput = node;
-					}}
-					placeholder={`Search ${dataIndex}`}
-					value={selectedKeys}
-					onChange={(e) => {
-						const pressedKeys = e.target.value;
-						setSelectedKeys(pressedKeys ? [pressedKeys] : []);
-						this.handleSearch(pressedKeys, confirm, dataIndex);
-					}}
-					onPressEnter={() =>
-						this.handleSearch(selectedKeys, confirm, dataIndex)
-					}
-					style={{ maxWidth: 188, marginBottom: 8, display: 'block' }}
-				/>
-				<Button
-					type="primary"
-					onClick={() => this.handleReset(clearFilters)}
-					size="small"
-					style={{ width: '100%' }}
-				>
-					Reset
-				</Button>
-			</div>
-		),
-		filterIcon: (filtered) => (
-			<SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
-		),
-		onFilter: (value, record) =>
-			record[dataIndex]
-				? record[dataIndex]
-						.toString()
-						.toLowerCase()
-						.includes(value.toLowerCase())
-				: '',
-		onFilterDropdownVisibleChange: (visible) => {
-			if (visible) {
-				setTimeout(() => this.searchInput.select());
-			}
-		},
-		render: (text) =>
-			this.state.searchedColumn === dataIndex ? (
-				<Highlighter
-					highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-					searchWords={[this.state.searchText]}
-					autoEscape
-					textToHighlight={text ? text.toString() : ''}
-				/>
-			) : (
-				text
+	getColumnSearchProps = (dataIndex) => {
+		const { searchedColumn, searchText } = this.state;
+
+		const columnSearchProps = {
+			filterDropdown: ({
+				setSelectedKeys,
+				selectedKeys,
+				confirm,
+				clearFilters,
+			}) => (
+				<Space direction="vertical" style={{ padding: 8 }}>
+					<Input
+						ref={(node) => {
+							this.searchInput = node;
+						}}
+						placeholder={`Search ${dataIndex}`}
+						value={selectedKeys}
+						onChange={(e) => {
+							const pressedKeys = e.target.value;
+							setSelectedKeys(pressedKeys ? [pressedKeys] : []);
+							this.handleSearch(pressedKeys, confirm, dataIndex);
+						}}
+						onPressEnter={() =>
+							this.handleSearch(selectedKeys, confirm, dataIndex)
+						}
+					/>
+					<Button
+						type="primary"
+						onClick={() => this.handleReset(clearFilters)}
+						size="small"
+						block
+					>
+						Reset
+					</Button>
+				</Space>
 			),
-	});
+			filterIcon: (filtered) => (
+				<SearchOutlined style={{ color: filtered ? '#1890ff' : '' }} />
+			),
+			onFilter: (value, record) =>
+				record[dataIndex]
+					? record[dataIndex]
+							.toString()
+							.toLowerCase()
+							.includes(value.toLowerCase())
+					: '',
+			onFilterDropdownVisibleChange: (visible) => {
+				if (visible) {
+					setTimeout(() => this.searchInput.select());
+				}
+			},
+			render: (text) =>
+				searchedColumn === dataIndex ? (
+					<SearchedResultHighlighter searchWords={[searchText]} text={text} />
+				) : (
+					text
+				),
+		};
+
+		return columnSearchProps;
+	};
 
 	handleSearch = (selectedKeys, confirm, dataIndex) => {
 		this.setState((prevState, props) => {
+			const pokemonsFilteredByName = getItemsFilteredByName(
+				props.initialData,
+				selectedKeys
+			);
+
 			return {
-				data: filter((pokemon) => {
-					return includes(
-						selectedKeys.toLowerCase(),
-						pokemon.name.toLowerCase()
-					);
-				}, props.initialData),
+				data: pokemonsFilteredByName,
 				searchText: selectedKeys,
 				searchedColumn: dataIndex,
 			};
