@@ -23,10 +23,10 @@ export const Home: FC = () => {
 		}
 	);
 	const [height, width] = useWindowSize();
-	const isLoadingAtStart = loading && networkStatus === 1;
+	const isLoadingPage = loading && networkStatus === 1;
 	const isFetchingMore = loading && networkStatus === 3;
 
-	if (isLoadingAtStart) return <Loader />;
+	if (isLoadingPage) return <Loader />;
 	if (error) return <div>Error! {error.message}</div>;
 
 	const { isMobile } = getDeviceType(width);
@@ -56,7 +56,7 @@ export const Home: FC = () => {
 				viewportWidth={width}
 				viewportHeight={height}
 				networkStatus={networkStatus}
-				loading={isLoadingAtStart || isFetchingMore}
+				loading={isLoadingPage || isFetchingMore}
 			/>
 		</>
 	);

@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import styled from 'styled-components';
-import './app.css';
 import { Home } from './pages/home/home';
+import './app.css';
 
 export const App: FC = () => (
 	<Main>
