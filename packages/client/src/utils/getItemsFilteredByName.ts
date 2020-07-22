@@ -1,11 +1,11 @@
 import { filter, includes } from 'ramda';
 
-interface Item {
+export interface Item {
 	name: string;
 }
 
-export const getItemsFilteredByName = (items: Item[], selectedKeys: string) => {
-	return filter((item: Item) => {
+export const getItemsFilteredByName = <T extends Item>(items: T[], selectedKeys: string): T[] => {
+	return filter((item: T) => {
 		return includes(selectedKeys.toLowerCase(), item.name.toLowerCase());
 	}, items);
 };

@@ -92,11 +92,8 @@ export class Table extends Component<TableProps, TableState> {
 	};
 
 	handleSearch = (selectedKeys: string, confirm: () => void, dataIndex: string) => {
-		console.log('Table -> handleSearch -> dataIndex', dataIndex);
-		console.log('Table -> handleSearch -> selectedKeys', selectedKeys);
 		this.setState((prevState: TableState, props: TableProps) => {
-			const pokemonsFilteredByName: any = getItemsFilteredByName(props.initialData, selectedKeys);
-			console.log('Table -> handleSearch -> pokemonsFilteredByName', pokemonsFilteredByName);
+			const pokemonsFilteredByName: Pokemon[] = getItemsFilteredByName(props.initialData, selectedKeys);
 
 			return {
 				pokemons: pokemonsFilteredByName,
