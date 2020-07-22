@@ -1,5 +1,10 @@
 import { Pokemon } from '../../../../typings/index';
 
+interface FilteredInfo {
+	name: null;
+	types: string[] | null;
+}
+
 export interface TableProps {
 	initialData: Pokemon[];
 	viewportWidth: number;
@@ -11,6 +16,6 @@ export interface TableProps {
 export interface TableState {
 	searchText: string;
 	searchedColumn: string;
-	filteredInfo: object;
-	data: object;
+	filteredInfo: FilteredInfo | null;
+	pokemons: Pokemon[];
 }

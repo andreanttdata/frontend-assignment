@@ -1,38 +1,41 @@
-// @ts-nocheck
-
-import React from 'react';
-import { map, uniq, unnest, pipe, includes } from 'ramda';
+import React, { Component } from 'react';
+import { map, includes } from 'ramda';
 import { Table as AntdTable, Input, Button, message, Space } from 'antd';
+import { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { SearchOutlined } from '@ant-design/icons';
 import { TagsList } from './components/TagsList';
 import { SearchedResultHighlighter } from './components/SearchedResultHighlighter';
-import { getDeviceType, getItemsFilteredByName } from '../../../../utils';
-import { TableProps, TableState } from './types';
+import { getDeviceType, getItemsFilteredByName, getTypes } from '../../../../utils';
+import { TableProps, TableState, FilteredInfo } from './types';
+import { Pokemon } from '../../../../typings';
 
-export class Table extends React.Component<TableProps, TableState> {
-	constructor(props) {
+export class Table extends Component<TableProps, TableState> {
+	constructor(props: TableProps) {
 		super(props);
 		this.state = {
 			searchText: '',
 			searchedColumn: '',
 			filteredInfo: null,
-			data: [],
+			pokemons: [],
 		};
+		this.searchInput = null;
 	}
 
-	updateTableData = (freshTableData) => {
+	searchInput: Input | null;
+
+	updateTableData = (freshTableData: Pokemon[]) => {
 		this.setState({
-			data: freshTableData,
+			pokemons: freshTableData,
 		});
 	};
 
 	componentDidMount() {
 		this.setState({
-			data: this.props.initialData,
+			pokemons: this.props.initialData,
 		});
 	}
 
-	componentDidUpdate(prevProps, prevState) {
+	componentDidUpdate(prevProps: TableProps, prevState) {
 		const nextProps = this.props;
 
 		if (prevProps.initialData !== nextProps.initialData) {
@@ -49,16 +52,11 @@ export class Table extends React.Component<TableProps, TableState> {
 	}
 
 	// Search
-	getColumnSearchProps = (dataIndex) => {
+	getColumnSearchProps = (dataIndex: string) => {
 		const { searchedColumn, searchText } = this.state;
 
 		const columnSearchProps = {
-			filterDropdown: ({
-				setSelectedKeys,
-				selectedKeys,
-				confirm,
-				clearFilters,
-			}) => (
+			filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
 				<Space direction="vertical" style={{ padding: 8 }}>
 					<Input
 						ref={(node) => {
@@ -71,87 +69,70 @@ export class Table extends React.Component<TableProps, TableState> {
 							setSelectedKeys(pressedKeys ? [pressedKeys] : []);
 							this.handleSearch(pressedKeys, confirm, dataIndex);
 						}}
-						onPressEnter={() =>
-							this.handleSearch(selectedKeys, confirm, dataIndex)
-						}
+						onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
 					/>
-					<Button
-						type="primary"
-						onClick={() => this.handleReset(clearFilters)}
-						size="small"
-						block
-					>
+					<Button type="primary" onClick={() => this.handleReset(clearFilters)} size="small" block>
 						Reset
 					</Button>
 				</Space>
 			),
-			filterIcon: (filtered) => (
-				<SearchOutlined style={{ color: filtered ? '#1890ff' : '' }} />
-			),
+			filterIcon: (filtered) => <SearchOutlined style={{ color: filtered ? '#1890ff' : '' }} />,
 			onFilter: (value, record) =>
-				record[dataIndex]
-					? record[dataIndex]
-							.toString()
-							.toLowerCase()
-							.includes(value.toLowerCase())
-					: '',
-			onFilterDropdownVisibleChange: (visible) => {
+				record[dataIndex] ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()) : '',
+			onFilterDropdownVisibleChange: (visible: boolean) => {
 				if (visible) {
-					setTimeout(() => this.searchInput.select());
+					setTimeout(() => this.searchInput?.select());
 				}
 			},
 			render: (text) =>
-				searchedColumn === dataIndex ? (
-					<SearchedResultHighlighter searchWords={[searchText]} text={text} />
-				) : (
-					text
-				),
+				searchedColumn === dataIndex ? <SearchedResultHighlighter searchWords={[searchText]} text={text} /> : text,
 		};
 
 		return columnSearchProps;
 	};
 
-	handleSearch = (selectedKeys, confirm, dataIndex) => {
-		this.setState((prevState, props) => {
-			const pokemonsFilteredByName = getItemsFilteredByName(
-				props.initialData,
-				selectedKeys
-			);
+	handleSearch = (selectedKeys: string, confirm: () => void, dataIndex: string) => {
+		console.log('Table -> handleSearch -> dataIndex', dataIndex);
+		console.log('Table -> handleSearch -> selectedKeys', selectedKeys);
+		this.setState((prevState: TableState, props: TableProps) => {
+			const pokemonsFilteredByName: any = getItemsFilteredByName(props.initialData, selectedKeys);
+			console.log('Table -> handleSearch -> pokemonsFilteredByName', pokemonsFilteredByName);
 
 			return {
-				data: pokemonsFilteredByName,
+				pokemons: pokemonsFilteredByName,
 				searchText: selectedKeys,
 				searchedColumn: dataIndex,
 			};
 		});
 	};
 
-	handleReset = (clearFilters) => {
+	handleReset = (clearFilters: () => void) => {
 		clearFilters();
 		this.setState((prevState, props) => ({
-			data: props.initialData,
+			pokemons: props.initialData,
 			searchText: '',
 		}));
 	};
 
 	// Filters
-	handleFiltersChange = (pagination, filters) => {
+	handleFiltersChange = (
+		pagination: TablePaginationConfig,
+		filters: Record<string, React.ReactText[]> & FilteredInfo
+	) => {
 		this.setState({
 			filteredInfo: filters,
 		});
 	};
 
 	render() {
-		const { data, filteredInfo = {} } = this.state;
+		const { pokemons, filteredInfo } = this.state;
 		const { viewportWidth, viewportHeight, loading } = this.props;
 
 		const { isMobile } = getDeviceType(viewportWidth);
-		const selectType = (pokemons) => map((pokemon) => pokemon.types, pokemons);
-		const getTypesList = pipe(selectType, unnest, uniq);
-		const pokemonTypes = getTypesList(data);
+		const pokemonTypes: string[] = getTypes(pokemons);
 		const filters = map((type) => ({ text: type, value: type }), pokemonTypes);
 
-		const columns = [
+		const columns: ColumnsType<Pokemon> = [
 			{
 				title: 'Name',
 				dataIndex: 'name',
@@ -178,7 +159,7 @@ export class Table extends React.Component<TableProps, TableState> {
 		return (
 			<AntdTable
 				columns={columns}
-				dataSource={data}
+				dataSource={pokemons}
 				onChange={this.handleFiltersChange}
 				loading={loading}
 				rowKey="id"
