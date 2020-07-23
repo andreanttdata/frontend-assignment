@@ -69,7 +69,6 @@ export class Table extends Component<TableProps, TableState> {
 							setSelectedKeys(pressedKeys ? [pressedKeys] : []);
 							this.handleSearch(pressedKeys, confirm, dataIndex);
 						}}
-						onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
 					/>
 					<Button type="primary" onClick={() => this.handleReset(clearFilters)} size="small" block>
 						Reset
