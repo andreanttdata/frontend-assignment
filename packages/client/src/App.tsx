@@ -12,6 +12,7 @@ export const App: FC = () => (
 const Main = styled.main`
 	max-width: 1200px;
 	padding: 5%;
+	margin: auto;
 
 	@media (max-width: 768px) {
 		padding: 0;
